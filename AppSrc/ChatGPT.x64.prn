@@ -1,5 +1,5 @@
 Compiling Program: C:\Projects\ChatGPTAPI\AppSrc\ChatGPT.src
-Memory Available: 18533511168
+Memory Available: 18666536960
 1>Use DFAllEnt.pkg
 Using pre-compiled package DFALLENT.PKG
 Including file: dfallent.x64.pkd    (C:\Program Files\DataFlex 23.0\Pkg\dfallent.x64.pkd)
@@ -3162,215 +3162,210 @@ Including file: cCJGridColumnRowIndicator.pkg    (C:\Program Files\DataFlex 23.0
 75546>>>        Send SetMemberValue of hoBody "model" jsonTypeString (Trim(sMod))
 75547>>>        Send SetMember of hoBody "messages" hoMsgs
 75548>>>        Send Destroy of hoMsgs
-75549>>>        Send SetMemberValue of hoBody "temperature" jsonTypeDouble 0.7
+75549>>>        
+75549>>>        Get MakeJsonCall of oHttp "POST" (psChatGPTBasePath(Self) + "chat/completions") "" hoBody to hoResp
 75550>>>        
-75550>>>        String sTest
-75550>>>        Set peWhiteSpace of hoBody to jpWhitespace_Pretty
-75551>>>        Get Stringify of hoBody to sTest
-75552>>>        
-75552>>>        Get MakeJsonCall of oHttp "POST" (psChatGPTBasePath(Self) + "chat/completions") "" hoBody to hoResp
-75553>>>        
-75553>>>        If hoResp Begin
-75555>>>            Move (JsonValueAtPath(hoResp, "choices[0].message.content")) to sResp
-75556>>>            Send Destroy of hoResp
-75557>>>            Set Value of oResponse to sResp
-75558>>>            Send AddToHistory "ChatGPT" sResp
+75550>>>        If hoResp Begin
+75552>>>            Move (JsonValueAtPath(hoResp, "choices[0].message.content")) to sResp
+75553>>>            Send Destroy of hoResp
+75554>>>            Set Value of oResponse to sResp
+75555>>>            Send AddToHistory "ChatGPT" sResp
+75556>>>        End
+75556>>>>
+75556>>>        Else Begin
+75557>>>            Send Info_Box ("Error status" * String(piError(oHttp(Self))) + ":" * psError(oHttp(Self))) "ChatGPT Error"
+75558>>>            Send AddToHistory "Program" (psError(oHttp(Self)))
 75559>>>        End
 75559>>>>
-75559>>>        Else Begin
-75560>>>            Send Info_Box ("Error status" * String(piError(oHttp(Self))) + ":" * psError(oHttp(Self))) "ChatGPT Error"
-75561>>>            Send AddToHistory "Program" (psError(oHttp(Self)))
-75562>>>        End
-75562>>>>
-75562>>>        
-75562>>>    End_Procedure
-75563>>>
-75563>>>    Object oModels is a ComboForm
-75565>>>        Set Size to 12 100
-75566>>>        Set Location to 4 521
-75567>>>        Set Label to "ChatGPT Model to use:"
-75568>>>        Set Label_Justification_Mode to JMode_Right
-75569>>>        Set Label_Col_Offset to 5
-75570>>>        Set peAnchors to anTopRight
-75571>>>    
-75571>>>        Procedure Combo_Fill_List
-75574>>>            Handle  hoMods hoData
-75574>>>            Integer i iMax
-75574>>>            
-75574>>>            Get MakeJsonCall of oHttp "GET" (psChatGPTBasePath(Self) + "models") "" 0 to hoMods
-75575>>>            
-75575>>>            If hoMods Begin
-75577>>>                
-75577>>>                If (HasMember(hoMods, "data")) Begin
-75579>>>                    Get Member of hoMods "data" to hoData
-75580>>>                    Get MemberCount of hoData to iMax
-75581>>>                    Decrement iMax
-75582>>>                    
-75582>>>                    For i from 0 to iMax
+75559>>>        
+75559>>>    End_Procedure
+75560>>>
+75560>>>    Object oModels is a ComboForm
+75562>>>        Set Size to 12 100
+75563>>>        Set Location to 4 521
+75564>>>        Set Label to "ChatGPT Model to use:"
+75565>>>        Set Label_Justification_Mode to JMode_Right
+75566>>>        Set Label_Col_Offset to 5
+75567>>>        Set peAnchors to anTopRight
+75568>>>    
+75568>>>        Procedure Combo_Fill_List
+75571>>>            Handle  hoMods hoData
+75571>>>            Integer i iMax
+75571>>>            
+75571>>>            Get MakeJsonCall of oHttp "GET" (psChatGPTBasePath(Self) + "models") "" 0 to hoMods
+75572>>>            
+75572>>>            If hoMods Begin
+75574>>>                
+75574>>>                If (HasMember(hoMods, "data")) Begin
+75576>>>                    Get Member of hoMods "data" to hoData
+75577>>>                    Get MemberCount of hoData to iMax
+75578>>>                    Decrement iMax
+75579>>>                    
+75579>>>                    For i from 0 to iMax
+75585>>>>
+75585>>>                        Send Combo_Add_Item (JsonValueAtPath(hoData, "[" + String(i) + "]id"))
+75586>>>                    Loop
+75587>>>>
+75587>>>                    
+75587>>>                    Send Destroy of hoData
+75588>>>                End
 75588>>>>
-75588>>>                        Send Combo_Add_Item (JsonValueAtPath(hoData, "[" + String(i) + "]id"))
-75589>>>                    Loop
-75590>>>>
-75590>>>                    
-75590>>>                    Send Destroy of hoData
-75591>>>                End
-75591>>>>
-75591>>>                
-75591>>>                Send Destroy of hoMods
-75592>>>            End
-75592>>>>
-75592>>>            
-75592>>>            Set Value to "gpt-3.5-turbo"
-75593>>>        End_Procedure
-75594>>>      
-75594>>>    End_Object
-75595>>>
-75595>>>    Object oAsk is a cTextEdit
-75597>>>        Set Size to 36 554
-75598>>>        Set Location to 28 10
-75599>>>        Set Label to "Ask ChatGPT something:"
-75600>>>        Set peAnchors to anTopLeftRight
-75601>>>    End_Object
-75602>>>
-75602>>>    Object oSendBtn is a Button
-75604>>>        Set Location to 28 571
-75605>>>        Set Label to "Send"
-75606>>>        Set peAnchors to anTopRight
-75607>>>    
-75607>>>        Procedure OnClick
-75610>>>            Send AskChatGPT
-75611>>>        End_Procedure
-75612>>>    
-75612>>>    End_Object
-75613>>>
-75613>>>    Object oClearBtn is a Button
-75615>>>        Set Location to 46 571
-75616>>>        Set Label to "Clear"
-75617>>>        Set peAnchors to anTopRight
-75618>>>    
-75618>>>        Procedure OnClick
-75621>>>            Set Value of oAsk to ""
-75622>>>        End_Procedure
-75623>>>    
-75623>>>    End_Object
-75624>>>
-75624>>>    Object oResponse is a cTextEdit
-75626>>>        Set Size to 128 610
-75627>>>        Set Location to 77 10
-75628>>>        Set Label to "ChatGPT replied:"
-75629>>>        Set peAnchors to anAll
-75630>>>    End_Object
-75631>>>
-75631>>>    Object oHistText is a TextBox
-75633>>>        Set Size to 9 25
-75634>>>        Set Location to 210 10
-75635>>>        Set Label to "History:"
-75636>>>        Set peAnchors to anBottomLeft
-75637>>>    End_Object
-75638>>>
-75638>>>    Object oHistory is a cCJGrid
-75640>>>        Set Size to 65 611
-75641>>>        Set Location to 220 10
-75642>>>        Set peAnchors to anBottomLeftRight
-75643>>>        Set pbReadOnly to True
+75588>>>                
+75588>>>                Send Destroy of hoMods
+75589>>>            End
+75589>>>>
+75589>>>            
+75589>>>            Set Value to "gpt-3.5-turbo"
+75590>>>        End_Procedure
+75591>>>      
+75591>>>    End_Object
+75592>>>
+75592>>>    Object oAsk is a cTextEdit
+75594>>>        Set Size to 36 554
+75595>>>        Set Location to 28 10
+75596>>>        Set Label to "Ask ChatGPT something:"
+75597>>>        Set peAnchors to anTopLeftRight
+75598>>>    End_Object
+75599>>>
+75599>>>    Object oSendBtn is a Button
+75601>>>        Set Location to 28 571
+75602>>>        Set Label to "Send"
+75603>>>        Set peAnchors to anTopRight
+75604>>>    
+75604>>>        Procedure OnClick
+75607>>>            Send AskChatGPT
+75608>>>        End_Procedure
+75609>>>    
+75609>>>    End_Object
+75610>>>
+75610>>>    Object oClearBtn is a Button
+75612>>>        Set Location to 46 571
+75613>>>        Set Label to "Clear"
+75614>>>        Set peAnchors to anTopRight
+75615>>>    
+75615>>>        Procedure OnClick
+75618>>>            Set Value of oAsk to ""
+75619>>>        End_Procedure
+75620>>>    
+75620>>>    End_Object
+75621>>>
+75621>>>    Object oResponse is a cTextEdit
+75623>>>        Set Size to 128 610
+75624>>>        Set Location to 77 10
+75625>>>        Set Label to "ChatGPT replied:"
+75626>>>        Set peAnchors to anAll
+75627>>>    End_Object
+75628>>>
+75628>>>    Object oHistText is a TextBox
+75630>>>        Set Size to 9 25
+75631>>>        Set Location to 210 10
+75632>>>        Set Label to "History:"
+75633>>>        Set peAnchors to anBottomLeft
+75634>>>    End_Object
+75635>>>
+75635>>>    Object oHistory is a cCJGrid
+75637>>>        Set Size to 65 611
+75638>>>        Set Location to 220 10
+75639>>>        Set peAnchors to anBottomLeftRight
+75640>>>        Set pbReadOnly to True
+75641>>>
+75641>>>        Object oCJGridColumnRowIndicator1 is a cCJGridColumnRowIndicator
+75643>>>        End_Object
 75644>>>
-75644>>>        Object oCJGridColumnRowIndicator1 is a cCJGridColumnRowIndicator
-75646>>>        End_Object
-75647>>>
-75647>>>        Object oDateTime is a cCJGridColumn
-75649>>>            Set piWidth to 50
-75650>>>            Set psCaption to "Time"
-75651>>>        End_Object
-75652>>>        
-75652>>>        Object oSpeaker is a cCJGridColumn
-75654>>>            Set piWidth to 20
-75655>>>            Set psCaption to "Speaker"
-75656>>>        End_Object
-75657>>>
-75657>>>        Object oMessage is a cCJGridColumn
-75659>>>            Set piWidth to 350
-75660>>>            Set psCaption to "Message"
-75661>>>        End_Object
-75662>>>
-75662>>>        Procedure ReloadHist
-75665>>>            tDataSourceRow[] atRows
-75665>>>            tDataSourceRow[] atRows
-75666>>>            Integer    iSpkCol iMsgCol iTimeCol i iMax
-75666>>>            String[]   asSpeakers asMsgs asTimes
+75644>>>        Object oDateTime is a cCJGridColumn
+75646>>>            Set piWidth to 50
+75647>>>            Set psCaption to "Time"
+75648>>>        End_Object
+75649>>>        
+75649>>>        Object oSpeaker is a cCJGridColumn
+75651>>>            Set piWidth to 20
+75652>>>            Set psCaption to "Speaker"
+75653>>>        End_Object
+75654>>>
+75654>>>        Object oMessage is a cCJGridColumn
+75656>>>            Set piWidth to 350
+75657>>>            Set psCaption to "Message"
+75658>>>        End_Object
+75659>>>
+75659>>>        Procedure ReloadHist
+75662>>>            tDataSourceRow[] atRows
+75662>>>            tDataSourceRow[] atRows
+75663>>>            Integer    iSpkCol iMsgCol iTimeCol i iMax
+75663>>>            String[]   asSpeakers asMsgs asTimes
+75666>>>            
+75666>>>            Get pasSpeakers to asSpeakers
+75667>>>            Get pasMessages to asMsgs
+75668>>>            Get pasTimes    to asTimes
 75669>>>            
-75669>>>            Get pasSpeakers to asSpeakers
-75670>>>            Get pasMessages to asMsgs
-75671>>>            Get pasTimes    to asTimes
+75669>>>            Get piColumnID of oSpeaker  to iSpkCol
+75670>>>            Get piColumnID of oMessage  to iMsgCol
+75671>>>            Get piColumnID of oDateTime to iTimeCol
 75672>>>            
-75672>>>            Get piColumnID of oSpeaker  to iSpkCol
-75673>>>            Get piColumnID of oMessage  to iMsgCol
-75674>>>            Get piColumnID of oDateTime to iTimeCol
-75675>>>            
-75675>>>            Move (SizeOfArray(asSpeakers) - 1) to iMax
-75676>>>            
-75676>>>            For i from 0 to iMax
-75682>>>>
-75682>>>                Move asTimes[iMax - i]    to atRows[i].sValue[iTimeCol]
-75683>>>                Move asSpeakers[iMax - i] to atRows[i].sValue[iSpkCol]
-75684>>>                Move asMsgs[iMax - i]     to atRows[i].sValue[iMsgCol]
-75685>>>            Loop
-75686>>>>
-75686>>>            
-75686>>>            Send InitializeData atRows
-75687>>>            Send MoveToFirstRow    
-75688>>>        End_Procedure
-75689>>>        
-75689>>>        Procedure OnRowChanged Integer iOldRow Integer iNewSelectedRow
-75692>>>            String[] asSpeakers asMsgs asTimes
-75695>>>            Integer  iMax i
-75695>>>            
-75695>>>            Get pasSpeakers to asSpeakers
-75696>>>            Get pasMessages to asMsgs
-75697>>>            Get pasTimes    to asTimes
-75698>>>            Move (SizeOfArray(asSpeakers) - 1) to iMax
-75699>>>            Move (iMax - iNewSelectedRow) to i
-75700>>>            
-75700>>>            Set Value of oMsgContent to (Trim(asSpeakers[i]) * ;                                        "(at" * Trim(asTimes[i] + "):" * ;                                        Trim(asMsgs[i])))
-75701>>>        End_Procedure
-75702>>>        
-75702>>>    End_Object
-75703>>>
-75703>>>    Object oMsgText is a TextBox
-75705>>>        Set Size to 9 29
-75706>>>        Set Location to 287 10
-75707>>>        Set Label to "Message:"
-75708>>>        Set peAnchors to anBottomLeft
-75709>>>    End_Object
-75710>>>
-75710>>>    Object oMsgContent is a cTextEdit
-75712>>>        Set Size to 40 611
-75713>>>        Set Location to 297 10
-75714>>>        Set peAnchors to anBottomLeftRight
-75715>>>    End_Object
-75716>>>
-75716>>>Cd_End_Object
-75718>>>>
-75718>
-75718>        Procedure Activate_About
-75721>            Send DoAbout "" "" "" "" ""
-75722>        End_Procedure
-75723>
-75723>    End_Object
+75672>>>            Move (SizeOfArray(asSpeakers) - 1) to iMax
+75673>>>            
+75673>>>            For i from 0 to iMax
+75679>>>>
+75679>>>                Move asTimes[iMax - i]    to atRows[i].sValue[iTimeCol]
+75680>>>                Move asSpeakers[iMax - i] to atRows[i].sValue[iSpkCol]
+75681>>>                Move asMsgs[iMax - i]     to atRows[i].sValue[iMsgCol]
+75682>>>            Loop
+75683>>>>
+75683>>>            
+75683>>>            Send InitializeData atRows
+75684>>>            Send MoveToFirstRow    
+75685>>>        End_Procedure
+75686>>>        
+75686>>>        Procedure OnRowChanged Integer iOldRow Integer iNewSelectedRow
+75689>>>            String[] asSpeakers asMsgs asTimes
+75692>>>            Integer  iMax i
+75692>>>            
+75692>>>            Get pasSpeakers to asSpeakers
+75693>>>            Get pasMessages to asMsgs
+75694>>>            Get pasTimes    to asTimes
+75695>>>            Move (SizeOfArray(asSpeakers) - 1) to iMax
+75696>>>            Move (iMax - iNewSelectedRow) to i
+75697>>>            
+75697>>>            Set Value of oMsgContent to (Trim(asSpeakers[i]) * ;                                        "(at" * Trim(asTimes[i] + "):" * ;                                        Trim(asMsgs[i])))
+75698>>>        End_Procedure
+75699>>>        
+75699>>>    End_Object
+75700>>>
+75700>>>    Object oMsgText is a TextBox
+75702>>>        Set Size to 9 29
+75703>>>        Set Location to 287 10
+75704>>>        Set Label to "Message:"
+75705>>>        Set peAnchors to anBottomLeft
+75706>>>    End_Object
+75707>>>
+75707>>>    Object oMsgContent is a cTextEdit
+75709>>>        Set Size to 40 611
+75710>>>        Set Location to 297 10
+75711>>>        Set peAnchors to anBottomLeftRight
+75712>>>    End_Object
+75713>>>
+75713>>>Cd_End_Object
+75715>>>>
+75715>
+75715>        Procedure Activate_About
+75718>            Send DoAbout "" "" "" "" ""
+75719>        End_Procedure
+75720>
+75720>    End_Object
+75721>
+75721>End_Object
+75722>
+75722>Send Activate_oChatGPTTest of (oClientArea(oMain))
+75723>Start_UI
 75724>
-75724>End_Object
-75725>
-75725>Send Activate_oChatGPTTest of (oClientArea(oMain))
-75726>Start_UI
-75727>
 Summary
-Memory Available: 18510299136
+Memory Available: 18643533824
 Total Warnings : 0
 Total Errors   : 0
 Total Symbols  : 43506
 Total Resources: 0
-Total Commands : 75726
+Total Commands : 75723
 Total Windows  : 0
 Total Pages    : 0
-Static Data    : 546723
-Message area   : 525137
-Total Blocks   : 28449
+Static Data    : 546691
+Message area   : 525086
+Total Blocks   : 28448

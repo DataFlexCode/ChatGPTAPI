@@ -72,11 +72,6 @@ Object oChatGPTTest is a dbView
         Send SetMemberValue of hoBody "model" jsonTypeString (Trim(sMod))
         Send SetMember of hoBody "messages" hoMsgs
         Send Destroy of hoMsgs
-        Send SetMemberValue of hoBody "temperature" jsonTypeDouble 0.7
-        
-        String sTest
-        Set peWhiteSpace of hoBody to jpWhitespace_Pretty
-        Get Stringify of hoBody to sTest
         
         Get MakeJsonCall of oHttp "POST" (psChatGPTBasePath(Self) + "chat/completions") "" hoBody to hoResp
         
