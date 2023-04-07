@@ -10,6 +10,7 @@ End_Object
 
 Use oEditContextMenu.pkg
 Use oDEOEditContextMenu17.pkg
+Use seq_chnl.pkg
 
 Object oMain is a Panel
     Set Label to "ChatGPT API Sample"
@@ -17,7 +18,24 @@ Object oMain is a Panel
     Set Size to 300 450
     
     // Note: Ideally you should get your own API Key: from https://platform.openai.com/account/api-keys
-    Property String psOpenAIAPIKey "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"
+    // Ha!  This key got disabled by OpenAI when they detected I'd uploaded it to GetHub, so it won't
+    // work now, hence you will have to get your own!
+    
+    Property String psOpenAIAPIKey // "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"
+    
+    Procedure SetOpenAIAPIKey
+        Integer iChn
+        String  sKey
+        
+        Get Seq_New_Channel to iChn
+        Direct_Input channel iChn "C:\Temp\OpenAIAPIKey.txt"
+        Read channel iChn sKey
+        Close_Input channel iChn
+        Send Seq_Release_Channel iChn
+        
+        Set psOpenAIAPIKey to sKey
+    End_Procedure
+    Send SetOpenAIAPIKey
     
     Object oCommandBarSystem is a cCJCommandBarSystem
         Set pbTimerUpdate to True
