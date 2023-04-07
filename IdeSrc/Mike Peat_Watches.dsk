@@ -1,0 +1,6 @@
+[ChatGPT.src]
+0="Stringify(hoMsg)"
+1="Stringify(hoMsgs)"
+2="Stringify(hoBody)"
+3="Stringify(hoResp)"
+4="Stringify(hoMods)"

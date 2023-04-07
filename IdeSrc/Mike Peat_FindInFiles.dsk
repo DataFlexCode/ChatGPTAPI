@@ -1,0 +1,13 @@
+[Header]
+Mask=*.src;*.vw;*.sl;*.dg;*.rv;*.bp;*.pkg;*.wo;*.dd;*.inc;*.tpl;*.dfo;*.asp;*.asa;*.html;*.css;*.js
+Active=0
+SubDirectories=1
+WholeWordOnly=0
+SearchWhere=0
+Location=C:\Projects\ChatGPTAPI\IdeSrc\Mike Peat_FindInFiles.dsk
+[C:\Projects\ChatGPTAPI\AppSrc]
+IsEnabled=1
+[C:\Projects\ChatGPTAPI\DDSrc]
+IsEnabled=1
+[C:\Projects\ChatGPTAPI\AppHtml]
+IsEnabled=1

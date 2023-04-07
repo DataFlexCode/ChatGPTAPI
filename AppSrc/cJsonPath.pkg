@@ -1,0 +1,294 @@
+﻿//==============================================================================
+// cJsonPath.pkg
+//
+// A class which will allow you to get either object handles or values or array
+// copunts from JSON objects using their path.
+// 
+// Author:  Mike Peat
+// Date:    06/02/2020
+//
+// Usage:
+//   To return a JSON object at a path:
+//       Get JsonAtPath of oJsonPathObject hoSourceJsonObject, path to hoVar
+//     or:
+//       Move (JsonAtPath(oJsonPathObject, hoSourceJsonObject, path)) to hoVar
+//
+//   To return a value at a path:
+//       Get ValueAtPath of oJsonPathObject hoSourceJsonObject path to sVar
+//     or
+//       Move (ValueAtPath(oJsonPathObject, hoSourceJson, path)) to sVar
+//
+// Path notation:
+//
+//    A string with JSON object names, separated by dots "." and array indices
+//    in square brackets: "foo.bar.baz[0].bill[1][0]"
+//
+// Sample JSON:
+//
+//    {
+//    	"foo": {
+//    		"bar": {
+//    			"baz": [
+//    				66.123,
+//    				{
+//    					"jim": "jack"
+//    				},
+//    				false,
+//    				{
+//    					"bob": 42
+//    				},
+//    				{
+//    					"kim": "possible"
+//    				},
+//    				[55, 1, 19, {
+//    					"Mork": [
+//    						[35, 67, 88, 100, [21, 33, 45, "Tim"]]
+//    					]
+//    				}]
+//    			]
+//    		}
+//    	}
+//    }
+//
+// Examples:
+//    Move (JsonAtPath(oJPath, hoJson, "foo.bar.baz[5][3].Mork[0][4][3]")) to hoObj
+//
+//    Get ValueAtPath of oJPath hJson "foo.bar.baz[5][3].Mork[0][4][3]" to sVal
+//      (sVal = "Tim")
+//
+// In the first example the JSON object would be returned; if you then performed
+// Move (JsonValue(hoObj)) to sVal you would get the same result as the second
+// example - i.e. "Tim".
+//
+// NOTE: JSON is case-sensitive, so your path-strings must exactly match the
+//       object names ("foo" is *not* "Foo") in the JSON file.
+//
+//==============================================================================
+//
+// Structure
+// =========
+//
+// The core function is JsonAtPath, which returns the JSON member in the passed
+// Json Object at the passed Path, if it is there.
+//
+// The two other public functions - ValueAtPath and CountAtPath - just call
+// JsonAtPath and then work on that to extract the Json value or the Array count
+// of that object respectively.
+//
+// JsonAtPath is supported by the two private functions, ObjectHandle and
+// ArrayHandle, which deal with Json Objects and Array Objects respectively that
+// are encountered in working down the path.  These call each other (or
+// theselves) recursively to deal with elements of the path.
+//
+//==============================================================================
+// Licence (MIT):
+//
+// Copyright 2020, Mike Peat, Unicorn InterGlobal Ltd.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell 
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+//
+//==============================================================================
+// Added CountAtPath function to return the count of elements in an array at the
+// passed path.
+//==============================================================================
+//
+// 2023-03-29  MJP (UIG): Allowed passing a JSON Array instead of a JSON Object.
+//
+//==============================================================================
+//
+// 2023-04-05  MJP (UIG): Changed logic for passing an empty (i.e. "") path.
+//                        Previously this would be an error and always return 0,
+//                        but it turns out that sometimes it is not, so handled
+//                        it better (I think! :0).  Seems to work OK.
+//
+//==============================================================================
+
+Use UI
+Use cJsonObject.pkg
+
+Class cJsonPath is a cObject
+    
+    Function ArrayHandle Handle hoJson String sPath Returns Handle
+        Integer iLSBPos iRSBPos iIndex
+        Handle  hoMemb hoObj
+        
+        If not hoJson ;
+            Function_Return 0
+            
+        If (sPath = "") Begin
+            
+            If (JsonType(hoJson) = jsonTypeArray) ;
+                Function_Return hoJson
+                
+            Send Destroy of hoJson
+            Function_Return 0
+        End
+        
+        Move (Pos("[", sPath)) to iLSBPos
+        Move (Pos("]", sPath)) to iRSBPos
+        
+        If (not(iLSBPos) or ;
+            not(iRSBPos) or ;
+            (iLSBPos > iRSBPos) or ;
+            (iLSBPos <> 1)) Begin
+            Send Destroy of hoJson
+            Function_Return 0
+        End
+        
+        Move (Mid(sPath, (iRSBPos - iLSBPos - 1), (iLSBPos + 1))) to iIndex
+        
+        If (MemberCount(hoJson) <= iIndex) Begin
+            Send Destroy of hoJson
+            Function_Return 0
+        End
+        
+        Get MemberByIndex of hoJson iIndex to hoMemb
+
+        If (Length(Trim(sPath)) = iRSBPos) Begin // It ends here
+            Send Destroy of hoJson
+            Function_Return hoMemb
+        End
+
+        Move (Right(sPath, (Length(sPath) - iRSBPos))) to sPath
+        If (Left(sPath, 1) = ".") ;
+            Move (Replace(".", sPath, "")) to sPath
+        Get ObjectHandle hoMemb sPath to hoObj
+        Send Destroy of hoJson
+        Function_Return hoObj
+    End_Function
+    
+    Function ObjectHandle Handle hoJson String sPath Returns Handle
+        Integer iLSBPos iDotPos iPos
+        String  sMemb
+        Handle  hoMemb hoObj
+
+        If not hoJson ;
+            Function_Return 0
+        
+        If (sPath = "") Begin
+            
+            If (JsonType(hoJson) = jsonTypeObject) ;
+                Function_Return hoJson
+                
+            Send Destroy of hoJson
+            Function_Return 0
+        End
+            
+        If (Left(sPath, 1) = "[") ;
+            Function_Return (ArrayHandle(Self, hoJson, sPath))
+        
+        Move (Pos(".", sPath))      to iDotPos
+        Move (Pos("[", sPath))      to iLSBPos
+        
+        If (iLSBPos and iDotPos) ;
+            Move (iDotPos min iLSBPos)  to iPos
+        Else If (iDotPos) ;
+            Move iDotPos                to iPos
+        Else ;
+            Move iLSBPos                to iPos
+        
+        If not iPos Begin  // We are there!
+            
+            If (HasMember(hoJson, sPath)) Begin
+                Get Member of hoJson sPath to hoMemb
+                Send Destroy of hoJson
+                Function_Return hoMemb
+            End
+            Else Begin
+                Send Destroy of hoJson
+                Function_Return 0
+            End
+        
+        End
+        
+        Move (Left(sPath, (iPos - 1)))    to sMemb
+        
+        If (HasMember(hoJson, sMemb)) Begin
+            Get Member of hoJson sMemb to hoMemb
+            Send Destroy of hoJson
+            Move (Right(sPath, (Length(sPath) - iPos + 1))) to sPath
+            If (Left(sPath, 1) = ".") ;
+                Move (Replace(".", sPath, "")) to sPath
+            Get ObjectHandle hoMemb sPath to hoObj
+            Function_Return hoObj
+        End
+        
+        Send Destroy of hoJson
+        Function_Return 0
+    End_Function
+    
+    Function JsonAtPath Handle hoJson String sPath Returns Handle
+        Handle  hoObj
+        UChar[] ucaJson
+        Boolean bOK
+        
+        If not hoJson ;
+            Function_Return 0
+        
+        If ((JsonType(hoJson) = jsonTypeArray) and (MemberCount(hoJson) = 0)) ;
+            Function_Return 0
+        
+        // Do this to "copy" hoJson to hoObj, so hoJson does not get destroyed
+        // in the process
+        Get StringifyUtf8 of hoJson to ucaJson
+        Get CreateNamed (RefClass(cJsonObject)) "CopyJson" to hoObj
+        Get ParseUtf8 of hoObj ucaJson to bOK
+        If (JsonType(hoObj) = jsonTypeArray) ;
+            Function_Return (ArrayHandle(Self, hoObj, sPath))
+        Else ;
+            Function_Return (ObjectHandle(Self, hoObj, sPath))
+    End_Function
+    
+    Function ValueAtPath Handle hoJson String sPath Returns String
+        Handle  hoObj
+        String  sVal
+        Integer iType
+        
+        Get JsonAtPath hoJson sPath to hoObj
+
+        If hoObj Begin
+            Get JsonType of hoObj to iType
+            
+            If ((iType <> jsonTypeObject) and ;
+                (iType <> jsonTypeArray) and ;
+                (iType <> jsonTypeNull)) ;
+                Move (JsonValue(hoObj)) to sVal
+            
+            Send Destroy of hoObj
+        End
+        
+        Function_Return sVal
+    End_Function
+    
+    Function CountAtPath Handle hoJson String sPath Returns Integer
+        Integer iCount
+        
+        Get JsonAtPath hoJson sPath to hoJson
+        
+        If not hoJson ;
+            Function_Return 0
+        
+        If (JsonType(hoJson) = jsonTypeArray) ;
+            Get MemberCount of hoJson to iCount
+            
+        Send Destroy of hoJson
+        Function_Return iCount
+    End_Function
+
+End_Class
