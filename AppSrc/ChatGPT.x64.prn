@@ -1,5 +1,5 @@
 Compiling Program: C:\Projects\ChatGPTAPI\AppSrc\ChatGPT.src
-Memory Available: 18132115456
+Memory Available: 17979486208
 1>Use DFAllEnt.pkg
 Using pre-compiled package DFALLENT.PKG
 Including file: dfallent.x64.pkd    (C:\Program Files\DataFlex 23.0\Pkg\dfallent.x64.pkd)
@@ -673,7 +673,7 @@ Including file: oDEOEditContextMenu17.pkg    (C:\Program Files\DataFlex 23.0\Pkg
 73949>    // Ha!  This key got disabled by OpenAI when they detected I'd uploaded it to GetHub, so it won't
 73949>    // work now, hence you will have to get your own!
 73949>    
-73949>    Property String psOpenAIAPIKey // "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"
+73949>    Property String psOpenAIAPIKey
 73951>    
 73951>    Procedure SetOpenAIAPIKey
 73954>        Integer iChn
@@ -3362,7 +3362,7 @@ Including file: cCJGridColumnRowIndicator.pkg    (C:\Program Files\DataFlex 23.0
 75726>Start_UI
 75727>
 Summary
-Memory Available: 18093527040
+Memory Available: 17968197632
 Total Warnings : 0
 Total Errors   : 0
 Total Symbols  : 43506

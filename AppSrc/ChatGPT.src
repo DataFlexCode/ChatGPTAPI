@@ -21,7 +21,7 @@ Object oMain is a Panel
     // Ha!  This key got disabled by OpenAI when they detected I'd uploaded it to GetHub, so it won't
     // work now, hence you will have to get your own!
     
-    Property String psOpenAIAPIKey // "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"
+    Property String psOpenAIAPIKey
     
     Procedure SetOpenAIAPIKey
         Integer iChn
