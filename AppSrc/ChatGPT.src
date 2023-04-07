@@ -18,7 +18,8 @@ Object oMain is a Panel
     Set Size to 300 450
     
     // Note: Ideally you should get your own API Key: from https://platform.openai.com/account/api-keys
-    // Ha!  This key got disabled by OpenAI when they detected I'd uploaded it to GetHub, so it won't
+    //
+    // Ha!  This key got disabled by OpenAI when they detected I'd uploaded it to GitHub, so it won't
     // work now, hence you will have to get your own!
     
     Property String psOpenAIAPIKey

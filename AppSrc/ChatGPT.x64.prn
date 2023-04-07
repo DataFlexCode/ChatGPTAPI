@@ -1,5 +1,5 @@
 Compiling Program: C:\Projects\ChatGPTAPI\AppSrc\ChatGPT.src
-Memory Available: 17979486208
+Memory Available: 18533511168
 1>Use DFAllEnt.pkg
 Using pre-compiled package DFALLENT.PKG
 Including file: dfallent.x64.pkd    (C:\Program Files\DataFlex 23.0\Pkg\dfallent.x64.pkd)
@@ -670,7 +670,8 @@ Including file: oDEOEditContextMenu17.pkg    (C:\Program Files\DataFlex 23.0\Pkg
 73948>    Set Size to 300 450
 73949>    
 73949>    // Note: Ideally you should get your own API Key: from https://platform.openai.com/account/api-keys
-73949>    // Ha!  This key got disabled by OpenAI when they detected I'd uploaded it to GetHub, so it won't
+73949>    //
+73949>    // Ha!  This key got disabled by OpenAI when they detected I'd uploaded it to GitHub, so it won't
 73949>    // work now, hence you will have to get your own!
 73949>    
 73949>    Property String psOpenAIAPIKey
@@ -3362,7 +3363,7 @@ Including file: cCJGridColumnRowIndicator.pkg    (C:\Program Files\DataFlex 23.0
 75726>Start_UI
 75727>
 Summary
-Memory Available: 17968197632
+Memory Available: 18510299136
 Total Warnings : 0
 Total Errors   : 0
 Total Symbols  : 43506
