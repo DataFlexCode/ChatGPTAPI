@@ -1,5 +1,5 @@
 Compiling Program: C:\Projects\ChatGPTAPI\AppSrc\ChatGPT.src
-Memory Available: 18159824896
+Memory Available: 17986433024
 1>Use DFAllEnt.pkg
 Using pre-compiled package DFALLENT.PKG
 Including file: dfallent.x64.pkd    (C:\Program Files\DataFlex 23.0\Pkg\dfallent.x64.pkd)
@@ -664,10 +664,11 @@ Including file: oDEOEditContextMenu17.pkg    (C:\Program Files\DataFlex 23.0\Pkg
 73943>>>End_Object
 73944>
 73944>Object oMain is a Panel
-73946>    Set Label To "My Project"
+73946>    Set Label to "ChatGPT API Sample"
 73947>    Set Location to 4 3
 73948>    Set Size to 300 450
-73949>
+73949>    
+73949>    // Note: Ideally you should get your own API Key: from https://platform.openai.com/account/api-keys
 73949>    Property String psOpenAIAPIKey "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"
 73951>    
 73951>    Object oCommandBarSystem is a cCJCommandBarSystem
@@ -3088,7 +3089,7 @@ Including file: cCJGridColumnRowIndicator.pkg    (C:\Program Files\DataFlex 23.0
 75487>>>    Set Border_Style to Border_Thick
 75488>>>    Set Size to 340 628
 75489>>>    Set Location to 2 2
-75490>>>    Set Label to "ChatGPT Test"
+75490>>>    Set Label to "ChatGPT Test View"
 75491>>>    
 75491>>>    Procedure AddToHistory String sSpeaker String sMsg
 75494>>>        String[]   asSpeakers asMsgs asTimes
@@ -3343,7 +3344,7 @@ Including file: cCJGridColumnRowIndicator.pkg    (C:\Program Files\DataFlex 23.0
 75712>Start_UI
 75713>
 Summary
-Memory Available: 18158133248
+Memory Available: 17966518272
 Total Warnings : 0
 Total Errors   : 0
 Total Symbols  : 43503
@@ -3351,6 +3352,6 @@ Total Resources: 0
 Total Commands : 75712
 Total Windows  : 0
 Total Pages    : 0
-Static Data    : 546719
+Static Data    : 546731
 Message area   : 525084
 Total Blocks   : 28446

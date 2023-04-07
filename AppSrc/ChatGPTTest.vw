@@ -18,7 +18,7 @@ Object oChatGPTTest is a dbView
     Set Border_Style to Border_Thick
     Set Size to 340 628
     Set Location to 2 2
-    Set Label to "ChatGPT Test"
+    Set Label to "ChatGPT Test View"
     
     Procedure AddToHistory String sSpeaker String sMsg
         String[]   asSpeakers asMsgs asTimes

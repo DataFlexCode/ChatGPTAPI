@@ -12,10 +12,11 @@ Use oEditContextMenu.pkg
 Use oDEOEditContextMenu17.pkg
 
 Object oMain is a Panel
-    Set Label To "My Project"
+    Set Label to "ChatGPT API Sample"
     Set Location to 4 3
     Set Size to 300 450
-
+    
+    // Note: Ideally you should get your own API Key: from https://platform.openai.com/account/api-keys
     Property String psOpenAIAPIKey "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"
     
     Object oCommandBarSystem is a cCJCommandBarSystem
