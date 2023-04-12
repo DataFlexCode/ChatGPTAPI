@@ -57,6 +57,8 @@ Object oChatGPTTest is a dbView
         
         Send AddToHistory "You" sAsk
         
+        Send Cursor_Wait of oCursor
+
         Get Create (RefClass(cJsonObject)) to hoMsg
         Send InitializeJsonType of hoMsg jsonTypeObject
         Send SetMemberValue of hoMsg "role" jsonTypeString "user"
@@ -86,6 +88,7 @@ Object oChatGPTTest is a dbView
             Send AddToHistory "Program" (psError(oHttp(Self)))
         End
         
+        Send Cursor_Ready of oCursor
     End_Procedure
 
     Object oModels is a ComboForm
