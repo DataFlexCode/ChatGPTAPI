@@ -1,6 +1,5 @@
 ﻿Use DFAllEnt.pkg
 Use cCJStandardCommandBarSystem.pkg
-Use Cursor.pkg
 
 Object oApplication is a cApplication
 End_Object
@@ -9,6 +8,7 @@ Object oToolTipController is a cToolTipController
     Move Self to ghoToolTipController
 End_Object
 
+Use Cursor.pkg
 Object oCursor is a CursorShape
 End_Object
 

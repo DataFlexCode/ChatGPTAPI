@@ -90,7 +90,7 @@ Object oChatGPTTest is a dbView
         
         Send Cursor_Ready of oCursor
     End_Procedure
-
+    
     Object oModels is a ComboForm
         Set Size to 12 100
         Set Location to 4 521
