@@ -1,0 +1,78 @@
+﻿Use UI
+Use cHttpTransferREST.pkg
+Use JsonPath.pkg
+
+Class cChatGPTAPI is a cObject
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+    
+        Property String   psChatGPTBasePath "v1/"
+        
+        Object oHttp is a cHttpTransferREST
+            Set psRemoteHost    to "api.openai.com"
+            Set piRemotePort    to rpHttpSSL
+            Set peTransferFlags to ifSecure
+            Set pbDefeatCaching to False
+        End_Object
+        
+    End_Procedure
+    
+    Function AvailableModels Returns String[]
+        Handle   hoMods hoData
+        Integer  i iMax
+        String[] asModels
+        
+        Get MakeJsonCall of oHttp "GET" (psChatGPTBasePath(Self) + "models") "" 0 to hoMods
+            
+        If hoMods Begin
+                
+                If (HasMember(hoMods, "data")) Begin
+                    Get Member of hoMods "data" to hoData
+                    Get MemberCount of hoData to iMax
+                    Decrement iMax
+                    
+                    For i from 0 to iMax
+                        Move (JsonValueAtPath(hoData, "[" + String(i) + "]id")) to asModels[i]
+                    Loop
+                    
+                    Send Destroy of hoData
+                End
+                
+                Send Destroy of hoMods
+            End
+            
+            Function_Return asModels
+    End_Function
+    
+    Function Ask String sQuestion String sModel Returns String
+        Handle  hoBody hoMsg hoMsgs hoResp
+        String  sResp sMod
+        
+        Get Create (RefClass(cJsonObject)) to hoMsg
+        Send InitializeJsonType of hoMsg jsonTypeObject
+        Send SetMemberValue of hoMsg "role" jsonTypeString "user"
+        Send SetMemberValue of hoMsg "content" jsonTypeString (Trim(sQuestion))
+        
+        Get Create (RefClass(cJsonObject)) to hoMsgs
+        Send InitializeJsonType of hoMsgs jsonTypeArray
+        Send AddMember of hoMsgs hoMsg
+        Send Destroy of hoMsg
+        
+        Get Create (RefClass(cJsonObject)) to hoBody
+        Send InitializeJsonType of hoBody jsonTypeObject
+        Send SetMemberValue of hoBody "model" jsonTypeString (Trim(sModel))
+        Send SetMember of hoBody "messages" hoMsgs
+        Send Destroy of hoMsgs
+        
+        Get MakeJsonCall of oHttp "POST" (psChatGPTBasePath(Self) + "chat/completions") "" hoBody to hoResp
+        
+        If hoResp Begin
+            Move (JsonValueAtPath(hoResp, "choices[0].message.content")) to sResp
+            Send Destroy of hoResp
+        End
+        
+        Function_Return sResp
+    End_Function
+
+End_Class

@@ -4,3 +4,4 @@
 2="Stringify(hoBody)"
 3="Stringify(hoResp)"
 4="Stringify(hoMods)"
+5="psChatGPTBasePath(Self) + "chat/completions""

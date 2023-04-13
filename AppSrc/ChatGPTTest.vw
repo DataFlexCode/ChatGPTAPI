@@ -5,6 +5,7 @@ Use cJsonObject.pkg
 Use cCJGrid.pkg
 Use cCJGridColumnRowIndicator.pkg
 Use cCJGridColumn.pkg
+Use cChatGPTAPI.pkg
 
 Deferred_View Activate_oChatGPTTest for ;
 Object oChatGPTTest is a dbView
@@ -19,6 +20,9 @@ Object oChatGPTTest is a dbView
     Set Size to 340 628
     Set Location to 2 2
     Set Label to "ChatGPT Test View"
+    
+    Object oChatGPT is a cChatGPTAPI
+    End_Object
     
     Procedure AddToHistory String sSpeaker String sMsg
         String[]   asSpeakers asMsgs asTimes
@@ -39,53 +43,24 @@ Object oChatGPTTest is a dbView
     End_Procedure
     
     Procedure AskChatGPT
-        Handle  hoBody hoMsg hoMsgs hoResp
-        String  sAsk sResp sMod
+        String sAsk sResp sModel
         
-        Set Value of oResponse to ""
-        
-        Get Value of oAsk to sAsk
-        If (sAsk = "") ;
-            Procedure_Return
-        
-        Get Value of oModels to sMod
-        
-        If (sMod = "") Begin
-            Send Info_Box "Please select a model to use (gpt-3.5-turbo for instance)" "Select Model"
-            Procedure_Return
-        End
+        Send Cursor_Wait of oCursor
+        Get Value of oAsk       to sAsk
+        Get Value of oModels    to sModel
         
         Send AddToHistory "You" sAsk
         
-        Send Cursor_Wait of oCursor
-
-        Get Create (RefClass(cJsonObject)) to hoMsg
-        Send InitializeJsonType of hoMsg jsonTypeObject
-        Send SetMemberValue of hoMsg "role" jsonTypeString "user"
-        Send SetMemberValue of hoMsg "content" jsonTypeString (Trim(sAsk))
+        Get Ask of oChatGPT sAsk sModel to sResp
         
-        Get Create (RefClass(cJsonObject)) to hoMsgs
-        Send InitializeJsonType of hoMsgs jsonTypeArray
-        Send AddMember of hoMsgs hoMsg
-        Send Destroy of hoMsg
-        
-        Get Create (RefClass(cJsonObject)) to hoBody
-        Send InitializeJsonType of hoBody jsonTypeObject
-        Send SetMemberValue of hoBody "model" jsonTypeString (Trim(sMod))
-        Send SetMember of hoBody "messages" hoMsgs
-        Send Destroy of hoMsgs
-        
-        Get MakeJsonCall of oHttp "POST" (psChatGPTBasePath(Self) + "chat/completions") "" hoBody to hoResp
-        
-        If hoResp Begin
-            Move (JsonValueAtPath(hoResp, "choices[0].message.content")) to sResp
-            Send Destroy of hoResp
+        If (sResp <> "") Begin
             Set Value of oResponse to sResp
             Send AddToHistory "ChatGPT" sResp
         End
         Else Begin
-            Send Info_Box ("Error status" * String(piError(oHttp(Self))) + ":" * psError(oHttp(Self))) "ChatGPT Error"
-            Send AddToHistory "Program" (psError(oHttp(Self)))
+            Send AddToHistory "ChatGPT" "No response received"
+            Send Info_Box ("ChatGPT did not respond - there was probably a timeout. 🙁" + ;
+                           "\nPerhaps just try sending your question again") "ChatGPT Error"
         End
         
         Send Cursor_Ready of oCursor
@@ -100,27 +75,15 @@ Object oChatGPTTest is a dbView
         Set peAnchors to anTopRight
     
         Procedure Combo_Fill_List
-            Handle  hoMods hoData
-            Integer i iMax
+            Integer  i iMax
+            String[] asMods
             
-            Get MakeJsonCall of oHttp "GET" (psChatGPTBasePath(Self) + "models") "" 0 to hoMods
+            Get AvailableModels of oChatGPT to asMods
+            Move (SizeOfArray(asMods) - 1)  to iMax
             
-            If hoMods Begin
-                
-                If (HasMember(hoMods, "data")) Begin
-                    Get Member of hoMods "data" to hoData
-                    Get MemberCount of hoData to iMax
-                    Decrement iMax
-                    
-                    For i from 0 to iMax
-                        Send Combo_Add_Item (JsonValueAtPath(hoData, "[" + String(i) + "]id"))
-                    Loop
-                    
-                    Send Destroy of hoData
-                End
-                
-                Send Destroy of hoMods
-            End
+            For i from 0 to iMax
+                Send Combo_Add_Item asMods[i]
+            Loop
             
             Set Value to "gpt-3.5-turbo"
         End_Procedure
