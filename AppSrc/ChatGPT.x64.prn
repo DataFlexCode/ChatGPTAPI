@@ -1,5 +1,5 @@
 Compiling Program: C:\Projects\ChatGPTAPI\AppSrc\ChatGPT.src
-Memory Available: 12034048000
+Memory Available: 11575369728
 1>Use DFAllEnt.pkg
 Using pre-compiled package DFALLENT.PKG
 Including file: dfallent.x64.pkd    (C:\Program Files\DataFlex 23.0\Pkg\dfallent.x64.pkd)
@@ -3095,27 +3095,22 @@ Including file: WinUuid.pkg    (C:\Program Files\DataFlex 23.0\Pkg\WinUuid.pkg)
 75465>>>
 75465>>>Cd_End_Object
 75467>>>>
-75467>
-75467>        Procedure Activate_About
-75470>            Send DoAbout "" "" "" "" ""
-75471>        End_Procedure
-75472>
-75472>    End_Object
-75473>
-75473>End_Object
-75474>
-75474>Send Activate_oChatGPTTest of (oClientArea(oMain))
-75475>Start_UI
-75476>
+75467>    End_Object
+75468>
+75468>End_Object
+75469>
+75469>Send Activate_oChatGPTTest of (oClientArea(oMain))
+75470>Start_UI
+75471>
 Summary
-Memory Available: 12008693760
+Memory Available: 11558019072
 Total Warnings : 0
 Total Errors   : 0
-Total Symbols  : 43464
+Total Symbols  : 43462
 Total Resources: 0
-Total Commands : 75475
+Total Commands : 75470
 Total Windows  : 0
 Total Pages    : 0
 Static Data    : 544547
-Message area   : 521478
-Total Blocks   : 28356
+Message area   : 521428
+Total Blocks   : 28354
